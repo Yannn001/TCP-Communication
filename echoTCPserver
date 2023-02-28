@@ -1,0 +1,98 @@
+#!/usr/bin/python3
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# OSU ID: <last.#>
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# echoTCPserver -- Socket Programming Sample Server
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+import socket
+import sys
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Global Variables
+# ···············································································
+
+serverIP = '127.0.0.1'              # loopback address (localhost)
+serverPort = '8090'                       # non-privileged port > 1024
+serverAddress = (serverIP, serverPort)     # Transport layer address = IP + port
+processingClientRequests = True              # Flag for processing
+
+# ···············································································
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Application Main
+#
+
+
+def main():
+
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #
+    #
+    try:
+        serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        print('echoTCPserver :: Opened TCP socket')
+        print('echoTCPserver :: Server starting on ', serverIP)
+        processingClientRequests = True
+
+        try:
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            #
+            #
+            serverSocket.bind(serverAddress)
+            print('echoTCPserver :: Bound to port ', serverPort)
+            processingClientRequests = True
+        except:
+            print('echoTCPserver :: Unable to bind to port '+str(serverPort))
+            processingClientRequests = False
+
+    except:
+        print('echoTCPserver :: Unable to create a server socket')
+        processingClientRequests = False
+
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # Continue if socket opend and bound to a port
+    #
+    if processingClientRequests:
+
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        #
+        #
+        print('echoTCPserver :: Listening on the server port')
+        serverSocket.listen()
+
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        #
+        #
+        clientConnection, clientAddress = serverSocket.accept()
+        print('echoTCPserver :: Accepted connection from ', str(clientAddress))
+
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # Process client requests
+        #
+        while processingClientRequests:
+
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            # Wait for a client request, max request is 2K
+            #
+            clientRequest = clientConnection.recv(2048).decode()
+            print('echoTCPserver :: Client request received ', clientRequest)
+
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            # Check if client wants to close
+            #
+            if clientRequest.upper() == 'QUIT' or clientRequest.upper() == 'CLOSE' or clientRequest.upper() == 'EXIT':
+                processingClientRequests = False
+            else:
+                # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                # Send modified data to client
+                #
+                print('echoTCPserver :: Sending server response ',
+                      clientRequest.upper())
+                clientConnection.send(clientRequest.upper().encode())
+
+        clientConnection.close()
+
+
+if __name__ == "__main__":
+    sys.exit(main())
