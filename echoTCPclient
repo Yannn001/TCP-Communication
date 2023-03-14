@@ -12,10 +12,10 @@ import sys
 # Global Variables
 #···············································································
 
-serverIP='<loopback address>'              # loopback address (localhost)
-serverPort=<server port>                   # non-privileged port > 1024
-serverAddress=(serverIP,serverPort)        # Transport layer address = IP + port
-processingUserInput=True                   # Flag for processing
+serverIP = '127.0.0.1'              # loopback address (localhost)
+serverPort = '8090'                   # non-privileged port > 1024
+serverAddress = (serverIP,serverPort)        # Transport layer address = IP + port
+processingUserInput = True                   # Flag for processing
 
 #···············································································
 
